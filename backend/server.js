@@ -1,29 +1,23 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import analyzeRoutes from "./src/routes/analyze.js";
-import { connectDB } from "./src/db.js";
+import { loadEnv } from "./config/env.js";
+import { connectDB } from "./config/db.js";
+import analyzeRoutes from "./routes/analyze.js";
+import { errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use("/api", analyzeRoutes);
+app.use(errorHandler);
 
-// turn multer errors (e.g. PDF over the limit) into JSON
-app.use((err, req, res, next) => {
-  if (err.code === "LIMIT_FILE_SIZE") {
-    return res.status(400).json({ error: "PDF is over the 5 MB limit" });
-  }
-  console.error(err);
-  res.status(500).json({ error: "Server error" });
-});
+const env = loadEnv();
 
-const PORT = process.env.PORT || 4000;
-
-connectDB()
+connectDB(env.MONGO_URI)
   .then(() => {
-    app.listen(PORT, () =>
-      console.log(`API listening on http://localhost:${PORT}`)
+    app.listen(env.PORT, () =>
+      console.log(`API listening on http://localhost:${env.PORT}`)
     );
   })
   .catch((err) => {

@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "$comment": "Serves server.js as a single serverless function for all /api routes.",
+  "version": 2,
+  "buildCommand": "npm install",
+  "installCommand": "npm install",
+  "outputDirectory": ".",
+  "cleanUrls": true,
+  "rewrites": [{ "source": "/api/(.*)", "destination": "/api/index" }]
+}
